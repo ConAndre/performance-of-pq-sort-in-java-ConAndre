@@ -24,7 +24,6 @@ public class PerformanceTest {
 			String[] sortedStrings = mySort.sort(stringsToSort[i]);			
 			long endTime = System.nanoTime();
 			totalTime += (endTime - startTime);
-			
 			if (!isSorted(sortedStrings)) {
 				throw new Exception("This list of strings is not sorted.");
 			}
@@ -36,11 +35,11 @@ public class PerformanceTest {
 	
 	private static boolean isSorted(String[] sortedStrings) {		
 		for (int i = 1; i < sortedStrings.length; i++) {
-			if (sortedStrings[i-1].compareTo(sortedStrings[i]) >= 0) {
+			if (sortedStrings[i-1].compareTo(sortedStrings[i]) > 0) {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -55,7 +54,17 @@ public class PerformanceTest {
 	private static String generateOneRandomString() {
 	    byte[] array = new byte[10]; 
 	    new Random().nextBytes(array);
-	    return new String(array, Charset.forName("UTF-8"));		
+		int leftLimit = 97; // letter 'a'
+		int rightLimit = 122; // letter 'z'
+		int targetStringLength = 10;
+		Random random = new Random();
+
+		String generatedString = random.ints(leftLimit, rightLimit + 1)
+				.limit(targetStringLength)
+				.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+				.toString();
+	    return generatedString;
+//	    return new String(array, Charset.forName("UTF-8"));
 	}
 
 	public static void main(String[] args) throws Exception {
