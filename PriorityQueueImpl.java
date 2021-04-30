@@ -7,7 +7,8 @@ import java.util.StringTokenizer;
  */
 public class PriorityQueueImpl implements PriorityQueue<String,String> {
 
-	private int size = 0;
+	private static final String SPACE = " ";
+	private int size = 1;
 	Entry<String,String>[] entries = new ConcreteEntry[size];
 
 	/**
@@ -42,16 +43,34 @@ public class PriorityQueueImpl implements PriorityQueue<String,String> {
 	public Entry<String, String> insert(String key, String value) throws IllegalArgumentException {
 		if (key == null || value == null ) throw new IllegalArgumentException();
 		Entry<String, String> entry = new ConcreteEntry(key,value);
-		this.size += 1;
 		int index = findInsertIndex(entry);
+		Entry<String, String>[] entries2;
 
 		// Can optimize the and statement
-		Entry<String, String>[] entries2 = (size == entries.length && (entries.length != 0)) ? new ConcreteEntry[entries.length*200] : new ConcreteEntry[entries.length+1];
+		if (entries.length == 0 ) {
+			entries2 = new ConcreteEntry[entries.length+1];
+		} else if (size == entries.length){
+			entries2 = new ConcreteEntry[entries.length*2];
+		} else {
+			this.size += 1;
+			this.entries[index] = entry;
 
-		if (entries.length - 1 - index >= 0)
-			System.arraycopy(entries, index + 1, entries2, index + 1 + 1, entries.length - 1 - index);
+			return entry;
+		}
 
-		entries2[index] = entry;
+		for (int i = 0; i < entries.length + 1; i++) {
+			if (i < index ) {
+				if (entries[i] == null) break;
+				entries2[i] = entries[i];
+			}
+			else if (i == index)
+				entries2[i] = entry;
+			else {
+				if (entries[i-1] == null) break;
+				entries2[i] = entries[i - 1];
+			}
+		}
+		this.size += 1;
 		this.entries = entries2;
 
 		return entry;
@@ -64,10 +83,10 @@ public class PriorityQueueImpl implements PriorityQueue<String,String> {
 	private int findFreeIndex(Entry<String, String> entry) {
 		String key = entry.getKey();
 		for (int i = 0; i < entries.length; i++) {
-			if (entries[i] != null)
+			if (entries[i] == null) return i;
 				if (key.compareTo(entries[i].getKey()) > 0 ) {
 					return i;
-				}
+			}
 		}
 		return entries.length;
 	}
@@ -100,17 +119,17 @@ public class PriorityQueueImpl implements PriorityQueue<String,String> {
 		this.entries = destination;
 		return entry;
 	}
-	String n = null;
 	public String[] toArray() {
 		StringBuilder sb = new StringBuilder();
-		for (Entry<String, String> entry : entries) {
+		for (int i = entries.length - 1; i >= 0; i--) {
+			Entry<String, String> entry = entries[i];
 			if (entry != null) {
 				sb.append(entry.getKey());
-				sb.append(n);
+				sb.append(SPACE);
 			}
 		}
 
-		return sb.toString().split("null");
+		return sb.toString().split(SPACE);
 	}
 
 }
